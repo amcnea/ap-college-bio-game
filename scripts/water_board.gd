@@ -145,7 +145,9 @@ func _process(delta: float) -> void:
 		hold_time = 0.0
 		fail_time += delta
 		var lattice := _lattice_center()
-		var methyl_pocket := m.ch3.distance_to(lattice) + 24.0 < m.oh_o.distance_to(lattice)
+		var ch3: Vector2 = m.ch3
+		var oh_o: Vector2 = m.oh_o
+		var methyl_pocket: bool = ch3.distance_to(lattice) + 24.0 < oh_o.distance_to(lattice)
 		if methyl_pocket and fail_time >= 2.0:
 			result = "fail"
 			fail_reason = "Hydroxyl in a methyl pocket — it won't stay."
@@ -173,9 +175,11 @@ func _draw() -> void:
 	_update_bonds()
 	for b in bonds:
 		var col := Color(0.45, 0.85, 0.95, 0.35)
-		if b.kind == "oh_water":
+		if str(b.kind) == "oh_water":
 			col = Color(0.55, 0.95, 1.0, 0.9)
-		_draw_bond(b.a, b.b, col)
+		var from_pt: Vector2 = b.a
+		var to_pt: Vector2 = b.b
+		_draw_bond(from_pt, to_pt, col)
 	for w in waters:
 		_draw_h2o(w, font)
 	var m := _methanol()
