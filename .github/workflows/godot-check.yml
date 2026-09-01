@@ -1,0 +1,32 @@
+name: Godot check
+on:
+  push:
+    branches: [master]
+  pull_request:
+  workflow_dispatch:
+jobs:
+  gdscript:
+    runs-on: ubuntu-latest
+    env:
+      GODOT_VERSION: "4.7.2"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install Godot
+        run: |
+          set -euo pipefail
+          curl -sL -o /tmp/godot.zip \
+            "https://github.com/godotengine/godot/releases/download/${GODOT_VERSION}-stable/Godot_v${GODOT_VERSION}-stable_linux.x86_64.zip"
+          unzip -o /tmp/godot.zip -d /tmp/godot
+          chmod +x /tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64
+          sudo mv /tmp/godot/Godot_v${GODOT_VERSION}-stable_linux.x86_64 /usr/local/bin/godot
+          godot --version
+      - name: Import project and fail on parser errors
+        run: |
+          set -euo pipefail
+          godot --headless --path . --import --quit-after 2 2>&1 | tee godot-check.log
+          if grep -E "Parser Error|Parse Error|SCRIPT ERROR|Failed to load script" godot-check.log; then
+            echo "::error::Godot reported script errors"
+            exit 1
+          fi
+
