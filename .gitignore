@@ -1,0 +1,9 @@
+.godot/
+*.translation
+android/
+*.apk
+*.aab
+.import/
+export.cfg
+*.so
+.DS_Store
